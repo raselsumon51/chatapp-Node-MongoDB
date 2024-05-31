@@ -10,13 +10,19 @@ const User = require('./models/User');
 const Message = require('./models/Message');
 const authRoutes = require('./routes/auth');
 const chatRoutes = require('./routes/chat');
+const MongoStore = require('connect-mongo');
+
 
 const app = express();
 const httpServer = createServer(app);
 const io = new Server(httpServer);
+require("dotenv").config();
+
+// const port = process.env.PORT; // Use environment variable for port
+const DATABASE_URL = process.env.DATABASE_URL;
 
 // Database connection
-mongoose.connect('mongodb+srv://raselsumon51:enPAmPa3oRxTsOCW@cluster0.nngte0p.mongodb.net/chatstore?retryWrites=true&w=majority', {
+mongoose.connect(DATABASE_URL, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
 }).then(() => {
@@ -31,10 +37,14 @@ app.use(cors());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.json());
 app.use(session({
-    secret: 'your-secret-key',
+    secret: 'ndsndsnbsdbbsdsbdbsdb',
     resave: false,
     saveUninitialized: true,
-    cookie: { secure: process.env.NODE_ENV === 'production' }
+    cookie: { maxAge: 14 * 24 * 60 * 60 * 1000 },
+    store: MongoStore.create({
+      mongoUrl: DATABASE_URL,
+      ttl: 14 * 24 * 60 * 60 // 14 days
+    })
 }));
 
 // Set view engine and views directory
@@ -88,7 +98,7 @@ io.on('connection', socket => {
 });
 
 // Start the server
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.port || 3000;
 httpServer.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });

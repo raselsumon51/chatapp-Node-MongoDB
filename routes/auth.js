@@ -43,7 +43,9 @@ router.post('/login', async (req, res) => {
 
         req.session.loggedIn = true;
         req.session.username = user.username;
-        res.redirect('/chat');
+        const targetUrl = `/chat/${username}`;
+        
+        res.redirect(targetUrl);
     } catch (error) {
         console.error('Error logging in user:', error);
         res.status(500).json({ error: 'Internal server error' });
