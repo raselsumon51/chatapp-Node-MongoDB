@@ -10,7 +10,7 @@ const User = require('./models/User');
 const Message = require('./models/Message');
 const authRoutes = require('./routes/auth');
 const chatRoutes = require('./routes/chat');
-const MongoStore = require('connect-mongo');
+// const MongoStore = require('connect-mongo');
 
 
 const app = express();
@@ -40,11 +40,11 @@ app.use(session({
     secret: 'ndsndsnbsdbbsdsbdbsdb',
     resave: false,
     saveUninitialized: true,
-    cookie: { maxAge: 14 * 24 * 60 * 60 * 1000 },
-    store: MongoStore.create({
-      mongoUrl: DATABASE_URL,
-      ttl: 14 * 24 * 60 * 60 // 14 days
-    })
+    cookie: { maxAge: 14 * 24 * 60 * 60 * 1000 }
+    // store: MongoStore.create({
+    //   mongoUrl: DATABASE_URL,
+    //   ttl: 14 * 24 * 60 * 60 // 14 days
+    // })
 }));
 
 // Set view engine and views directory
