@@ -60,11 +60,11 @@ io.on('connection', socket => {
     // Event handler for receiving messages
     socket.on('chat message', async data => {
         const { sender, receiver, message } = data;
+        console.log(Message);
 
         try {
             // Save message to the database
             const newMessage = new Message({ sender, receiver, message });
-            console.log(Message);
             await newMessage.save();
 
             // Emit the message to the receiver if online

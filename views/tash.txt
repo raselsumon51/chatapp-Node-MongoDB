@@ -1,0 +1,31 @@
+<body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
+    <div class="bg-white shadow-md rounded-lg p-6 w-full max-w-3xl">
+        <h1 class="text-2xl font-bold mb-4 text-center">Welcome <span class="text-blue-500"><%= username %></span>!</h1>
+        <h1 class="text-xl font-bold mb-2 text-center p-4">User List</h1>
+        <ul>
+            <% users.forEach(user => { %>
+                <li class="mb-4">
+                    <div class="flex items-center">
+                        <div class="mr-4">
+                            <span class="font-semibold"></span> <%= user.username %>
+                        </div>
+                        <button onclick="toggleMessageForm('<%= user.username %>')" class="px-4 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"> Message</button> <br><br>
+
+                        <div class="flex items-center">
+                            <div id="message_form_<%= user.username %>" style="display: none;">
+                                <input id="message_<%= user.username %>" class="mr-2 px-2 py-1 border border-gray-300 rounded" autocomplete="off" />
+                                <button onclick="sendPrivateMessage('<%= user.username %>')" class="px-4 py-1 bg-blue-500 text-white rounded hover:bg-blue-600">Send</button>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+            <% }); %>
+        </ul>
+        <h1 class="text-xl font-bold mt-8 mb-2">Messages</h1>
+        <ul id="messages">
+            <% messages.forEach(msg => { %>
+                <li class="mb-2"><span class="font-semibold"><%= msg.sender %>:</span> <%= msg.message %></li>
+            <% }); %>
+        </ul>
+    </div>
+</body>

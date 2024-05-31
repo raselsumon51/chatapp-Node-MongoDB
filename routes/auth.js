@@ -2,6 +2,10 @@ const express = require('express');
 const router = express.Router();
 const User = require('../models/User');
 
+router.get('/', (req, res) => {
+    res.render('index',{loggedIn:false});
+});
+
 router.get('/register', (req, res) => {
     res.render('register');
 });
@@ -39,7 +43,7 @@ router.post('/login', async (req, res) => {
 
         req.session.loggedIn = true;
         req.session.username = user.username;
-        res.redirect('/chat');
+        res.redirect('/chat/1');
     } catch (error) {
         console.error('Error logging in user:', error);
         res.status(500).json({ error: 'Internal server error' });
