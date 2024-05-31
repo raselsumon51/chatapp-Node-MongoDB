@@ -22,7 +22,7 @@ require("dotenv").config();
 const DATABASE_URL = process.env.DATABASE_URL;
 
 // Database connection
-mongoose.connect(DATABASE_URL, {
+mongoose.connect('mongodb+srv://raselsumon51:enPAmPa3oRxTsOCW@cluster0.nngte0p.mongodb.net/userchat?retryWrites=true&w=majority', {
     useNewUrlParser: true,
     useUnifiedTopology: true,
 }).then(() => {
