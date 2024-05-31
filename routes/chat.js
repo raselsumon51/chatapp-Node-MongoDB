@@ -8,7 +8,7 @@ router.get('/chat', async (req, res) => {
     // console.log(req.session)
     const chat = true;
     const receiver =""
-    if (!req.session.username) {
+    if (!req.session.loggedIn) {
         return res.redirect('/');
     }
 
@@ -28,7 +28,7 @@ router.get('/chat/:username', async (req, res) => {
     const chat = false;
 
 try {
-    if (!req.session.username) {
+    if (!req.session.loggedIn) {
         return res.redirect('/');
     }
 
