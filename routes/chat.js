@@ -3,25 +3,25 @@ const router = express.Router();
 const Message = require('../models/Message');
 const User = require('../models/User');
 
-// // Chat page route
-// router.get('/chat', async (req, res) => {
-//     // console.log(req.session)
-//     const chat = true;
-//     const receiver =""
-//     if (!req.session.loggedIn) {
-//         return res.redirect('/');
-//     }
+// Chat page route
+router.get('/chat', async (req, res) => {
+    // console.log(req.session)
+    const chat = true;
+    const receiver =""
+    if (!req.session.loggedIn) {
+        return res.redirect('/');
+    }
 
-//     try {
-//         const messages = await Message.find({
-//             $or: [{ sender: req.session.username }, { receiver: req.session.username }]
-//         }).sort('timestamp').exec();
-//         const users = await User.find({ username: { $ne: req.session.username } }, 'username').exec();
-//         res.render('chat1', { username: req.session.username, users, messages, receiver, chat });
-//     } catch (err) {
-//         res.status(500).send('Internal server error');
-//     }
-// });
+    try {
+        const messages = await Message.find({
+            $or: [{ sender: req.session.username }, { receiver: req.session.username }]
+        }).sort('timestamp').exec();
+        const users = await User.find({ username: { $ne: req.session.username } }, 'username').exec();
+        res.render('chat1', { username: req.session.username, users, messages, receiver, chat });
+    } catch (err) {
+        res.status(500).send('Internal server error');
+    }
+});
 
 router.get('/chat/:username', async (req, res) => {
     const user = req.params.username;
