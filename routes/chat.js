@@ -46,7 +46,7 @@ try {
 
     const users = await User.find({ username: { $ne: req.session.username } }, 'username').exec();
 
-    console.log(messages);
+    // console.log(messages);
 
     res.render('chat1', { username: req.session.username, users, messages, receiver: user,chat });
 } catch (err) {

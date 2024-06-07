@@ -17,6 +17,7 @@
         function sendPrivateMessage(receiver) {
             var message = document.getElementById('message_' + receiver).value;
             socket.emit('chat message', { sender: username, receiver: receiver, message: message });
+            
             document.getElementById('message_' + receiver).value = '';
             const li = document.createElement('li');
             li.className = 'd-flex justify-content-end mb-4';
@@ -109,29 +110,32 @@
         <div class="container-fluid">
             <div class="card chat-app">
                 <div class="row g-0">
-                    <div class="col-md-4 border-end people-list">
+                    <div class="col-4 col-md-3 border-end people-list">
                         <div class="p-3">
-                            <div class="input-group mb-3">
+                            <!-- <div class="input-group mb-3">
                                 <span class="input-group-text"><i class="fa fa-search"></i></span>
                                 <input type="text" class="form-control" placeholder="Search...">
-                            </div>
+                            </div> -->
                             <ul class="list-unstyled chat-list">
                                 <% users.forEach(user => { %>
-                                    <li class="user-item d-flex align-items-center p-2">
-                                        <a href="/chat/<%= user.username %>" class="user-link">
-                                            <img src="https://bootdey.com/img/Content/avatar/avatar1.png" alt="avatar" class="rounded-circle me-2">
-                                            <div>
+                                    <li class="user-item d-flex justify-content-center align-items-center p-2 mb-2" style="background-color: #3498db; color: white; border-radius: 0.25rem;">
+                                        <a href="/chat/<%= user.username %>" class="user-link d-flex flex-column align-items-center text-decoration-none" style="color: white;">
+                                            <img src="https://bootdey.com/img/Content/avatar/avatar1.png" alt="avatar" class="rounded-circle mb-2">
+                                            <div class="text-center">
                                                 <div class="fw-bold"><%= user.username %></div>
                                                 <div class="text-muted"><i class="fa fa-circle text-danger"></i> Active </div>
                                             </div>
                                         </a>
                                     </li>
                                 <% }); %>
-                            </ul>
+                            </ul> 
+                           
                         </div>
                     </div>
-                    <div class="col-md-8">
+                    <div class="col-8 col-md-9">
                         <div class="chat">
+                            <h3 class="text-center py-2">Welcome <%= username %></h3>
+                            <h5 class="text-center py-2">Sent Message to <%= receiver %></h5>
                             <div class="chat-history p-3">
                                 <ul id="messages-list">
                                     <% messages.forEach(message => { %>
@@ -156,7 +160,7 @@
                                     <input type="text" id="message_<%= receiver %>" class="form-control" placeholder="Enter text here..." />
                                 </div>
                                 <div class="input-group mt-2">
-                                    <button onclick="sendPrivateMessage('<%= receiver %>')" class="btn btn-primary" type="button">Send</button>
+                                    <button onclick="sendPrivateMessage('<%= receiver %>')" class="btn btn-primary px-4" type="button">Send</button>
                                 </div>               
                             </div>         
                         </div>
