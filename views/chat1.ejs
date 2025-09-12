@@ -64,24 +64,37 @@
    
 </head>
 <body class="bg-gray-100">
-    <div class="container mx-auto p-4 flex flex-col md:flex-row">
+    <div class=" mx-auto flex flex-col md:flex-row">
+
         <!-- People List -->
-        <div class="w-full md:w-1/3 border-r border-gray-300 p-4">
+        <div class="w-full h-[100vh] md:w-1/3 border-r border-gray-300 pl-16 pt-12" style="overflow-y: auto; background-color: #F6F2EE;">
             <h2 class="text-lg font-semibold mb-4">People List</h2>
-            <ul class="divide-y divide-gray-300">
+            <ul class="divide-y divide-gray-300" >
                 <% users.forEach(user => { %>
                 <li class="py-2">
                     <a href="/chat/<%= user.username %>" class="flex items-center">
-                        <img src="https://bootdey.com/img/Content/avatar/avatar1.png" alt="avatar" class="rounded-full w-8 h-8 mr-2">
-                        <span><%= user.username %></span>
+                        <img width="50" height="50" src="https://bootdey.com/img/Content/avatar/avatar1.png" alt="avatar" class="rounded-full mr-2">
+                        <span style="font-size: 16px;"><%= user.username %></span>
                     </a>
                 </li>
                 <% }); %>
             </ul>
+      
+            <div class="absolute bottom-0 left-0  p-4 bg-white">
+                <a href="/logout" class="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded-full w-full text-center block">Logout</a>
+            </div>
+
         </div>
+
+
         <!-- Chat History -->
-        <div class="w-full md:w-2/3 p-4" style="height: 640px;overflow: auto !important; padding-bottom: 50px !important;">
-            <div class="chat" style="overflow-y: auto;">
+
+        <% if (username==receiver) { %>
+            <h3 class="text-center py-2">Welcome <%= username %></h3>
+            
+        <% } else { %>
+            <div class="w-full h-[82vh] md:w-2/3 p-4" style=" overflow-y: auto;  padding-bottom: 50px !important; ">
+            <div class="chat" >
                 <h3 class="text-center py-2">Welcome <%= username %></h3>
                 <h5 class="text-center py-2">Sent Message to <%= receiver %></h5>
                 <div class="chat-history p-3">
@@ -106,10 +119,13 @@
             </div>
             
             <div class=" rounded p-2 absolute bottom-0 right-0 w-2/3">
-                <input type="text" id="message_<%= receiver %>" class="w-full rounded-lg border-gray-300 focus:ring-blue-500 focus:border-blue-500 px-4 py-2 mb-2 p-0" style="overflow-wrap: break-word;" placeholder="Enter text here...">
+                <input type="text" id="message_<%= receiver %>" class="w-full rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 px-4 py-2 mb-2 p-0" style="overflow-wrap: break-word;" placeholder="Enter text here...">
                 <button onclick="sendPrivateMessage('<%= receiver %>')" class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-full">Send</button>
             </div>
         </div>
+        <% } %>
+
+        
     </div>
 </body>
 

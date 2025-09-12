@@ -70,7 +70,6 @@ io.on('connection', socket => {
     // Event handler for receiving messages
     socket.on('chat message', async data => {
         const { sender, receiver, message } = data;
-        console.log(Message);
 
         try {
             // Save message to the database
@@ -79,6 +78,7 @@ io.on('connection', socket => {
 
             // Emit the message to the receiver if online
             const receiverSocket = users[receiver];
+            
             if (receiverSocket) {
                 io.to(receiverSocket).emit('private message', { sender, message });
             }
@@ -88,17 +88,17 @@ io.on('connection', socket => {
         }
     });
 
-    socket.on('disconnect', () => {
-        console.log('User disconnected:', socket.id);
-        const disconnectedUser = Object.keys(users).find(key => users[key] === socket.id);
-        if (disconnectedUser) {
-            delete users[disconnectedUser];
-        }
-    });
+    // socket.on('disconnect', () => {
+    //     console.log('User disconnected:', socket.id);
+    //     const disconnectedUser = Object.keys(users).find(key => users[key] === socket.id);
+    //     if (disconnectedUser) {
+    //         delete users[disconnectedUser];
+    //     }
+    // });
 });
 
 // Start the server
 const PORT = process.env.port || 3000;
 httpServer.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
+    console.log(`http://localhost:${PORT}`);
 });
