@@ -1,133 +1,137 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chat App</title>
-    
-    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js" integrity="sha384-2huaZvOR9iDzHqslqwpR87isEmrfxqyWOF7hr7BY6KG0+hVKLoEXMPUJw3ynWuhO" crossorigin="anonymous"></script>
-    <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous"> -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chat App</title>
 
-    <script>
-        var socket = io();
-        var username = '<%= username %>';
+  <script src="https://cdn.socket.io/4.7.5/socket.io.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+  
+ <script>
+  var socket = io();
+  var username = '<%= username %>';
+  var mobileChatOpen = false; // track if chat is open on mobile
 
-        // Function to send message to a specific person
-        function sendPrivateMessage(receiver) {
-            var message = document.getElementById('message_' + receiver).value;
-            socket.emit('chat message', { sender: username, receiver: receiver, message: message });
-            
-            document.getElementById('message_' + receiver).value = '';
-            const li = document.createElement('li');
-            li.className = 'flex justify-end mb-4';
-            li.innerHTML = `
-                <div class="message other-message p-3 rounded bg-blue-500 text-white">
-                    ${message}
-                </div>
-            `;
-            const messagesList = document.getElementById('messages-list');
-            messagesList.appendChild(li);
-        }
+  function sendPrivateMessage(receiver) {
+    var message = document.getElementById('messageInput').value;
+    if (!message.trim()) return;
+    socket.emit('chat message', { sender: username, receiver: receiver, message: message });
+    document.getElementById('messageInput').value = '';
+    appendMessage(message, 'self');
+  }
 
-        document.addEventListener('DOMContentLoaded', function() {
-            // Once the messages are loaded, set up the socket listener for private messages
-            socket.on('private message', function(data) {
-                const li = document.createElement('li');
-                if (data.sender === username) {
-                    li.className = 'flex justify-end mb-4';
-                    li.innerHTML = `
-                        <div class="message other-message p-3 rounded bg-blue-500 ">
-                            ${data.message}
-                        </div>
-                    `;
-                } else {
-                    li.className = 'flex justify-start mb-4';
-                    li.innerHTML = `
-                        <div class="message my-message p-3 rounded   bg-gray-200 ">
-                            ${data.message}
-                        </div>
-                    `;
-                }
-                const messagesList = document.getElementById('messages-list');
-                messagesList.appendChild(li);
-            });
-        });
+  function appendMessage(message, type) {
+    const li = document.createElement('li');
+    li.className = type === 'self' ? 'flex justify-end mb-4' : 'flex justify-start mb-4';
+    li.innerHTML = `<div class="message p-3 rounded ${type === 'self' ? 'bg-blue-500 text-white' : 'bg-gray-200'}">${message}</div>`;
+    const messagesList = document.getElementById('messages-list');
+    messagesList.appendChild(li);
+    messagesList.scrollTop = messagesList.scrollHeight;
+  }
 
-        // Send the username to the server when connected
-        socket.on('connect', function() {
-            socket.emit('join', username);
-        });
-    </script>
-    
-   
+  document.addEventListener('DOMContentLoaded', function() {
+    socket.on('private message', function(data) {
+      if (data.sender === username) {
+        appendMessage(data.message, 'self');
+      } else {
+        appendMessage(data.message, 'other');
+      }
+    });
+  });
+
+  socket.on('connect', function() {
+    socket.emit('join', username);
+  });
+
+  function openChat(receiver) {
+    if (window.innerWidth < 768) {
+      document.getElementById('peopleList').classList.add('hidden');
+      document.getElementById('chatArea').classList.remove('hidden');
+      mobileChatOpen = true;
+    }
+    document.getElementById('chatHeader').innerText = `Chat with ${receiver}`;
+    document.getElementById('sendBtn').onclick = function() { sendPrivateMessage(receiver); };
+
+    const messagesList = document.getElementById('messages-list');
+    messagesList.scrollTop = messagesList.scrollHeight;
+  }
+
+  function goBack() {
+    document.getElementById('chatArea').classList.add('hidden');
+    document.getElementById('peopleList').classList.remove('hidden');
+    mobileChatOpen = false;
+  }
+
+  window.addEventListener('resize', () => {
+    if (window.innerWidth >= 768) {
+      // Desktop: show both
+      document.getElementById('peopleList').classList.remove('hidden');
+      document.getElementById('chatArea').classList.remove('hidden');
+    } else {
+      // Mobile: hide chat if not opened
+      if (!mobileChatOpen) {
+        document.getElementById('chatArea').classList.add('hidden');
+        document.getElementById('peopleList').classList.remove('hidden');
+      }
+    }
+  });
+</script>
+
 </head>
-<body class="bg-gray-100">
-    <div class=" mx-auto flex flex-col md:flex-row">
 
-        <!-- People List -->
-        <div class="w-full h-[100vh] md:w-1/3 border-r border-gray-300 pl-16 pt-12" style="overflow-y: auto; background-color: #F6F2EE;">
-            <h2 class="text-lg font-semibold mb-4">People List</h2>
-            <ul class="divide-y divide-gray-300" >
-                <% users.forEach(user => { %>
-                <li class="py-2">
-                    <a href="/chat/<%= user.username %>" class="flex items-center">
-                        <img width="50" height="50" src="https://bootdey.com/img/Content/avatar/avatar1.png" alt="avatar" class="rounded-full mr-2">
-                        <span style="font-size: 16px;"><%= user.username %></span>
-                    </a>
-                </li>
-                <% }); %>
-            </ul>
-      
-            <div class="absolute bottom-0 left-0  p-4 bg-white">
-                <a href="/logout" class="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded-full w-full text-center block">Logout</a>
-            </div>
+<body class="bg-gray-100 h-screen flex flex-col md:flex-row">
 
-        </div>
-
-
-        <!-- Chat History -->
-
-        <% if (username==receiver) { %>
-            <h3 class="text-center py-2">Welcome <%= username %></h3>
-            
-        <% } else { %>
-            <div class="w-full h-[82vh] md:w-2/3 p-4" style=" overflow-y: auto;  padding-bottom: 50px !important; ">
-            <div class="chat" >
-                <h3 class="text-center py-2">Welcome <%= username %></h3>
-                <h5 class="text-center py-2">Sent Message to <%= receiver %></h5>
-                <div class="chat-history p-3">
-                    <ul id="messages-list">
-                        <% messages.forEach(message => { %>
-                            <% if (message.sender === username) { %>
-                                <li class="flex justify-end mb-4">
-                                    <div class="message my-message p-3 bg-blue-500 text-white rounded">
-                                        <%= message.message %>
-                                    </div>
-                                </li>
-                            <% } else { %>
-                                <li class="flex justify-start mb-4">
-                                    <div class="message other-message p-3 bg-gray-200 rounded">
-                                        <%= message.message %>
-                                    </div>
-                                </li>
-                            <% } %>
-                        <% }); %>
-                    </ul>
-                </div>
-            </div>
-            
-            <div class=" rounded p-2 absolute bottom-0 right-0 w-2/3">
-                <input type="text" id="message_<%= receiver %>" class="w-full rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 px-4 py-2 mb-2 p-0" style="overflow-wrap: break-word;" placeholder="Enter text here...">
-                <button onclick="sendPrivateMessage('<%= receiver %>')" class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-full">Send</button>
-            </div>
-        </div>
-        <% } %>
-
-        
+  <!-- People List -->
+  <div id="peopleList" class="w-full md:w-1/3 bg-[#F6F2EE] border-r border-gray-300 flex flex-col">
+    <div class="p-4 md:p-6 flex-1 overflow-y-auto">
+      <h2 class="text-lg font-semibold mb-4">People List</h2>
+      <ul class="divide-y divide-gray-300">
+        <% users.forEach(user => { %>
+        <li class="py-2">
+          <button class="flex items-center w-full text-left" onclick="openChat('<%= user.username %>')">
+            <img width="50" height="50" src="https://bootdey.com/img/Content/avatar/avatar1.png" alt="avatar" class="rounded-full mr-2">
+            <span class="text-base"><%= user.username %></span>
+          </button>
+        </li>
+        <% }); %>
+      </ul>
     </div>
+    <div class="p-4">
+      <a href="/logout" class="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded-full w-full text-center block">Logout</a>
+    </div>
+  </div>
+
+  <!-- Chat Area -->
+  <div id="chatArea" class="w-full md:w-2/3 flex flex-col h-screen hidden md:flex">
+    <!-- Mobile back button -->
+    <div class="md:hidden p-2">
+      <button onclick="goBack()" class="bg-gray-300 px-3 py-1 rounded">⬅ Back</button>
+    </div>
+
+    <div class="flex-1 p-4 overflow-y-auto">
+      <h3 id="chatHeader" class="text-center py-2">Welcome</h3>
+      <ul id="messages-list">
+        <% messages.forEach(message => { %>
+          <% if (message.sender === username) { %>
+          <li class="flex justify-end mb-4">
+            <div class="message my-message p-3 bg-blue-500 text-white rounded"><%= message.message %></div>
+          </li>
+          <% } else { %>
+          <li class="flex justify-start mb-4">
+            <div class="message other-message p-3 bg-gray-200 rounded"><%= message.message %></div>
+          </li>
+          <% } %>
+        <% }); %>
+      </ul>
+    </div>
+
+    <div class="p-4 flex gap-2 border-t border-gray-300">
+      <input type="text" id="messageInput" class="flex-1 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 px-4 py-2" placeholder="Enter text here...">
+      <button id="sendBtn" class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-full">Send</button>
+    </div>
+  </div>
+
 </body>
-
-
 </html>
